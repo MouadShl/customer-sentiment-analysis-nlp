@@ -18,4 +18,4 @@ The main objectives are:
 🚧 In progress – Academic project (Data Science)
 
 ## Author
-Mouad Shl
+Mouad Souhal
