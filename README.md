@@ -1,4 +1,3 @@
-# customer-sentiment-analysis-nlp
 # Customer Sentiment Analysis using NLP
 
 ## Project Overview
