@@ -1,2 +1,22 @@
 # customer-sentiment-analysis-nlp
-NLP project focused on analyzing customer reviews. The goal is to classify sentiment (positive/negative) and identify key aspects influencing customer satisfaction such as price, quality, delivery, and service using machine learning techniques.
+# Customer Sentiment Analysis using NLP
+
+## Project Overview
+This project aims to analyze customer reviews using Natural Language Processing (NLP) techniques.
+The main objectives are:
+- Sentiment classification (positive / negative)
+- Identification of key aspects influencing customer satisfaction
+- Model interpretability and insights extraction
+
+## Technologies Used
+- Python
+- Scikit-learn
+- NLP (TF-IDF)
+- Streamlit (for demo)
+- Matplotlib / Seaborn
+
+## Project Status
+🚧 In progress – Academic project (Data Science)
+
+## Author
+Mouad Shl
