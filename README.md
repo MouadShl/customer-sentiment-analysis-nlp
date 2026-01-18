@@ -12,7 +12,7 @@
 
 Détection automatique **positif / négatif** • Interprétation des mots importants • Déploiement Cloud
 
-[🌐 Application Live](YOUR_STREAMLIT_APP_URL) • [📖 Documentation](#-documentation) • [🚀 Démo Express](#-démo-express-30-secondes) • [💡 Innovation](#-innovation-différenciante)
+[🌐 Application Live](https://customer-sentiment-analysis-nlp-6fjlxyvsbztrdtp9gkedpx.streamlit.app/) • [📖 Documentation](#-documentation) • [🚀 Démo Express](#-démo-express-30-secondes) • [💡 Innovation](#-innovation-différenciante)
 
 ---
 
@@ -29,7 +29,7 @@ Une solution **end-to-end** de NLP développée pour analyser des avis clients e
 
 ## 🌐 Application Live — Testez Maintenant !
 
-### 🚀 [DÉMO LIVE IMMÉDIATE](YOUR_STREAMLIT_APP_URL)
+### 🚀 [DÉMO LIVE IMMÉDIATE](https://customer-sentiment-analysis-nlp-6fjlxyvsbztrdtp9gkedpx.streamlit.app/)
 
 **Zero configuration** • Interface simple • Résultat instantané
 
@@ -37,7 +37,7 @@ Une solution **end-to-end** de NLP développée pour analyser des avis clients e
 
 ## ⚡ Démo Express (30 secondes)
 
-1. Ouvrez : **[Application Live](YOUR_STREAMLIT_APP_URL)**
+1. Ouvrez : **[Application Live](https://customer-sentiment-analysis-nlp-6fjlxyvsbztrdtp9gkedpx.streamlit.app/)**
 2. Collez un avis client (ex: “Fast delivery, great quality!”)
 3. Cliquez **Predict**
 4. L’app affiche **POSITIVE / NEGATIVE**
@@ -50,7 +50,7 @@ Une solution **end-to-end** de NLP développée pour analyser des avis clients e
 |---|---|---|
 | Déploiement | Local uniquement | ✅ **Démo Live Streamlit** |
 | Data dans GitHub | Repo lourd | ✅ Dataset téléchargé auto (Release) |
-| Interpretabilité | “boîte noire” | ✅ Mots influents (weights) |
+| Interprétabilité | “boîte noire” | ✅ Mots influents (weights) |
 | Reproductibilité | scripts éparpillés | ✅ pipeline clair + notebook |
 
 ---
