@@ -1,74 +1,82 @@
 from pathlib import Path
-import pandas as pd
-import numpy as np
-import streamlit as st
 import re
-from pathlib import Path
-import urllib.request
-import streamlit as st
-import urllib.request
 import tempfile
-from pathlib import Path
-import streamlit as st
-import pandas as pd
+import urllib.request
+
 import numpy as np
-import re
+import pandas as pd
+import streamlit as st
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+
+# ----------------------------
+# Config
+# ----------------------------
+st.set_page_config(page_title="Sentiment Analysis", layout="centered")
 
 DATA_URL = "https://github.com/MouadShl/customer-sentiment-analysis-nlp/releases/download/v1.0/Amazon_Reviews_clean.csv"
+DATA_FILENAME = "Amazon_Reviews_clean.csv"
 
+
+# ----------------------------
+# Helpers
+# ----------------------------
 def get_dataset_path() -> Path:
-    # Use temp folder (works on Streamlit Cloud / Codespaces)
-    dest = Path(tempfile.gettempdir()) / "Amazon_Reviews_clean.csv"
-
-    if not dest.exists():
-        st.info("Downloading dataset for the online demo...")
-        urllib.request.urlretrieve(DATA_URL, dest)
-        st.success("Dataset downloaded ✅")
-
-    return dest
-
-
-DATA_URL = "https://github.com/MouadShl/customer-sentiment-analysis-nlp/releases/download/v1.0/Amazon_Reviews_clean.csv"
-
-def get_dataset_path() -> Path:
-    data_dir = Path(__file__).resolve().parents[1] / "data"
-    data_dir.mkdir(exist_ok=True)
-    local_path = data_dir / "Amazon_Reviews_clean.csv"
-
-    # Local dev: use existing file if present
+    """
+    Returns a path to the dataset.
+    - Local dev: if data/Amazon_Reviews_clean.csv exists, use it
+    - Online: download to temp folder once and reuse
+    """
+    # Try local repo data folder first (if you have it locally)
+    local_path = Path(__file__).resolve().parents[1] / "data" / DATA_FILENAME
     if local_path.exists():
         return local_path
 
-    # Online (Streamlit Cloud): download it once
-    st.info("Téléchargement du dataset pour la démo en ligne...")
-    urllib.request.urlretrieve(DATA_URL, local_path)
-    st.success("Dataset téléchargé ✅")
-    return local_path
+    # Otherwise use temp folder (Streamlit Cloud / Codespaces friendly)
+    dest = Path(tempfile.gettempdir()) / DATA_FILENAME
+    if not dest.exists():
+        st.info("Téléchargement du dataset pour la démo en ligne...")
+        urllib.request.urlretrieve(DATA_URL, dest)
+        st.success("Dataset téléchargé ✅")
+    return dest
 
-
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-
-st.set_page_config(page_title="Sentiment Analysis", layout="centered")
 
 def extract_rating_num(rating_text: str):
+    """
+    Extracts a numeric rating (1-5) from strings like 'Rated 4 out of 5 stars'
+    """
     m = re.search(r"(\d)", str(rating_text))
     return float(m.group(1)) if m else np.nan
 
+
+def load_dataframe(path: Path) -> pd.DataFrame:
+    """
+    Robust CSV loader for messy files / encoding issues.
+    """
+    try:
+        return pd.read_csv(path, engine="python", on_bad_lines="skip", encoding="utf-8")
+    except UnicodeDecodeError:
+        return pd.read_csv(path, engine="python", on_bad_lines="skip", encoding="latin-1")
+
+
+# ----------------------------
+# Train pipeline (cached)
+# ----------------------------
 @st.cache_resource
 def train_pipeline():
     data_path = get_dataset_path()
-
-try:
-    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip", encoding="utf-8")
-except UnicodeDecodeError:
-    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip", encoding="latin-1")
+    df = load_dataframe(data_path)
 
     TEXT_COL = "Review Text"
     RATING_COL = "Rating"
 
+    # Basic cleaning
     df = df.dropna(subset=[TEXT_COL, RATING_COL]).copy()
+
+    # Create numeric rating and sentiment
     df["Rating_num"] = df[RATING_COL].astype(str).apply(extract_rating_num)
     df = df.dropna(subset=["Rating_num"]).copy()
     df["sentiment"] = df["Rating_num"].apply(lambda x: "positive" if x >= 4 else "negative")
@@ -76,8 +84,12 @@ except UnicodeDecodeError:
     X = df[TEXT_COL].astype(str)
     y = df["sentiment"].astype(str)
 
-    X_train, _, y_train, _ = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    # Train/test split
+    X_train, _, y_train, _ = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
+    # TF-IDF + Logistic Regression
     tfidf = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), stop_words="english")
     X_train_vec = tfidf.fit_transform(X_train)
 
@@ -86,6 +98,10 @@ except UnicodeDecodeError:
 
     return tfidf, model
 
+
+# ----------------------------
+# UI
+# ----------------------------
 tfidf, model = train_pipeline()
 
 st.title("Customer Review Sentiment (NLP)")
