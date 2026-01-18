@@ -6,6 +6,27 @@ import re
 from pathlib import Path
 import urllib.request
 import streamlit as st
+import urllib.request
+import tempfile
+from pathlib import Path
+import streamlit as st
+import pandas as pd
+import numpy as np
+import re
+
+DATA_URL = "https://github.com/MouadShl/customer-sentiment-analysis-nlp/releases/download/v1.0/Amazon_Reviews_clean.csv"
+
+def get_dataset_path() -> Path:
+    # Use temp folder (works on Streamlit Cloud / Codespaces)
+    dest = Path(tempfile.gettempdir()) / "Amazon_Reviews_clean.csv"
+
+    if not dest.exists():
+        st.info("Downloading dataset for the online demo...")
+        urllib.request.urlretrieve(DATA_URL, dest)
+        st.success("Dataset downloaded ✅")
+
+    return dest
+
 
 DATA_URL = "https://github.com/MouadShl/customer-sentiment-analysis-nlp/releases/download/v1.0/Amazon_Reviews_clean.csv"
 
@@ -37,9 +58,12 @@ def extract_rating_num(rating_text: str):
 
 @st.cache_resource
 def train_pipeline():
-    data_path = Path(__file__).resolve().parents[1] / "data" / "Amazon_Reviews_clean.csv"
     data_path = get_dataset_path()
-    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip")
+
+try:
+    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip", encoding="utf-8")
+except UnicodeDecodeError:
+    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip", encoding="latin-1")
 
     TEXT_COL = "Review Text"
     RATING_COL = "Rating"
