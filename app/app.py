@@ -3,6 +3,27 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import re
+from pathlib import Path
+import urllib.request
+import streamlit as st
+
+DATA_URL = "https://github.com/MouadShl/customer-sentiment-analysis-nlp/releases/download/v1.0/Amazon_Reviews_clean.csv"
+
+def get_dataset_path() -> Path:
+    data_dir = Path(__file__).resolve().parents[1] / "data"
+    data_dir.mkdir(exist_ok=True)
+    local_path = data_dir / "Amazon_Reviews_clean.csv"
+
+    # Local dev: use existing file if present
+    if local_path.exists():
+        return local_path
+
+    # Online (Streamlit Cloud): download it once
+    st.info("Téléchargement du dataset pour la démo en ligne...")
+    urllib.request.urlretrieve(DATA_URL, local_path)
+    st.success("Dataset téléchargé ✅")
+    return local_path
+
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -17,7 +38,8 @@ def extract_rating_num(rating_text: str):
 @st.cache_resource
 def train_pipeline():
     data_path = Path(__file__).resolve().parents[1] / "data" / "Amazon_Reviews_clean.csv"
-    df = pd.read_csv(data_path)
+    data_path = get_dataset_path()
+    df = pd.read_csv(data_path, engine="python", on_bad_lines="skip")
 
     TEXT_COL = "Review Text"
     RATING_COL = "Rating"
